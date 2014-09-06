@@ -1,0 +1,72 @@
+{
+	"name": "Parcela-virtual-dom",
+	"version": "0.1.0",
+	"description": "Parcela's Virtual DOM",
+	"author": {
+		"name": "Daniel Barreiro",
+		"email": "devasatyam@gmail.com"
+	},
+	"licenses": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Parcela/virtual-dom"
+	},
+	"bugs": {
+		"url": "https://github.com/Parcela/virtual-dom/issues"
+	},
+	"keywords": [
+		"Parcela",
+		"vdom",
+		"virtualDOM",
+		"DOM",
+		"render"
+	],
+	"main": "virtual-dom.js",
+	"dependencies": {
+		"core-utils":"Parcela/utils",
+		"core-lang-ext":"Parcela/lang-ext"
+	},
+	"devDependencies": {
+		"chai": "^1.9.1",
+		"istanbul": "^0.3.0",
+		"jshint": "^2.5.5",
+		"mocha": "^1.21.4",
+
+		"fake-dom": "Parcela/fake-dom"
+	},
+	"engines": {
+		"node": "*"
+	},
+
+	"scripts": {
+		"pretest": "jshint ./virtual-dom.js",
+		"test": "mocha -R dot tests/*.js  && istanbul cover $(which _mocha) -- tests/*.js  -R dot ",
+		"lint": "jshint ./virtual-dom.js"
+	},
+	"testling": {
+		"harness": "mocha",
+		"files": "tests/*.js",
+		"browsers": [
+			"ie/6..latest",
+			"chrome/22..latest",
+			"firefox/16..latest",
+			"safari/latest",
+			"opera/11.0..latest",
+			"iphone/6",
+			"ipad/6",
+			"android-browser/latest"
+		]
+	},
+
+	"homepage": "http://Parcela.github.io",
+	"maintainers": [
+		{
+			"name": "Daniel Barreiro",
+			"email": "devasatyam@gmail.com"
+    	},
+		{
+			"name": "Marco Asbreuk",
+			"email": "marco@itsasbreuk.nl"
+    	}
+  	]
+}
