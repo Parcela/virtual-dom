@@ -23,8 +23,8 @@
 	],
 	"main": "virtual-dom.js",
 	"dependencies": {
-		"core-utils":"Parcela/utils",
-		"core-lang-ext":"Parcela/lang-ext"
+		"utils":"Parcela/utils",
+		"lang-ext":"Parcela/lang-ext"
 	},
 	"devDependencies": {
 		"chai": "^1.9.1",
