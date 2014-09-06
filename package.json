@@ -1,5 +1,5 @@
 {
-	"name": "Parcela-virtual-dom",
+	"name": "virtual-dom",
 	"version": "0.1.0",
 	"description": "Parcela's Virtual DOM",
 	"author": {
@@ -32,7 +32,8 @@
 		"jshint": "^2.5.5",
 		"mocha": "^1.21.4",
 
-		"fake-dom": "Parcela/fake-dom"
+		"fake-dom": "Parcela/fake-dom",
+		"parcel":"Parcela/parcel"
 	},
 	"engines": {
 		"node": "*"
