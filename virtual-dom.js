@@ -621,7 +621,7 @@ module.exports = function (window) {
 							});
 							return;
 						case 'class':
-							node.className = value.join(' ');
+							node.className = value.join(' ').trim();
 							return;
 						case 'data':
 						if (!namespace) break;
@@ -662,7 +662,7 @@ module.exports = function (window) {
 				while (i < l && value[i] == newValue[i]) i++;
 			}
 			if (i < l) {
-				existing.node.className = newValue.join(' ');
+				existing.node.className = newValue.join(' ').trim();
 			}
 		},
 		/**
