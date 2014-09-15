@@ -225,20 +225,27 @@ module.exports = function (window) {
 		},
 
 		/**
-		Determines which [Parcel](Parcel.html) instance is the root app for this page
+		Determines which [Parcel](Parcel.html) is the root app for this page
 		and which is the DOM element it corresponds to and renders the app.
 
-		If ITSA controls the whole screen, the corresponding DOM element is going to be
+		If the root app controls the whole screen, the corresponding DOM element is going to be
 		`document.body`, which is the default when omitted.
 
 		@method rootApp
-		@param parcel {Parcel} instance of [Parcel](Parcel.html) that is the root of the app
-		@param [element=document.body] {DOM element} DOM element that is the root of the app
-		@return {Parcel} the `parcel` argument;
+		@param Parcel {Parcel} instance of [Parcel](Parcel.html) that is the root of the app.
+		@param [element=document.body] {DOM element} DOM element that is the root of the app.
+		@param [parcelConfig] {Object} optional arguments to provide to Parcel when intantiating it.
+		@return {Parcel} the root parcel just created (available in the [rootParcel](#property_rootParcel) property).
 		@static
 		*/
-		rootApp: function (parcel, rootNode) {
-			rootParcel = parcel;
+		rootApp: function (Parcel, rootNode, parcelConfig) {
+			if (rootParcel) rootParcel.destroy();
+			
+			if (arguments.length < 3 && rootNode && typeof rootNode.nodeName !== 'string') {
+				parcelConfig = rootNode;
+				rootNode = null;
+			}
+			rootParcel = new Parcel(parcelConfig);
 			/* global document:true */
 			rootNode = rootNode || document.body;
 			// Set a vNode to match the root
@@ -248,11 +255,11 @@ module.exports = function (window) {
 				children:[],
 				node:rootNode
 			};
-			var pNode = v._buildPNode(parcel);
+			var pNode = v._buildPNode(rootParcel);
 			rootNode.appendChild(pNode.node);
 			v._vDOM.children.push(pNode);
 
-			return parcel;
+			return rootParcel;
 		},
 		/**
 		Returns a new `pNode` based on the given parcel and namspace.
@@ -269,6 +276,7 @@ module.exports = function (window) {
 				.merge( {parcel:parcel, stamp:NaN, attrs: {}, children:[]});
 
 			parcel._pNode = pNode;
+			parcel.preView();
 			v._diffPNode(pNode, parcel);
 			return pNode;
 		},
@@ -453,6 +461,7 @@ module.exports = function (window) {
 						v._diffPNode(child, newChild);
 					} else {
 						var oldNode = child.node;
+						child.parcel.postView();
 						child = v._buildPNode(newChild, namespace);
 
 						insertNode(oldNode);
@@ -468,7 +477,10 @@ module.exports = function (window) {
 
 				// These end up with nothing so whatever was there has to be removed:
 				vu: removeNode,
-				pu: removeNode,
+				pu: function () {
+					child.parcel.postView();
+					removeNode();
+				},
 				su: removeNode,
 
 				// The following are ordered by destination
@@ -482,6 +494,7 @@ module.exports = function (window) {
 				},
 				pv: function () {
 					var oldNode = child.node;
+					child.parcel.postView();
 
 					child = v._buildVNode(newChild.tag, namespace);
 
@@ -528,6 +541,7 @@ module.exports = function (window) {
 				},
 				ps: function () {
 					var oldNode = child.node;
+					child.parcel.postView();
 
 					child = v._buildStringNode(newChild);
 
@@ -538,8 +552,8 @@ module.exports = function (window) {
 			var whatIsIt = function (child) {
 				if (child === undefined) return 'u';
 				if (typeof child === 'object') {
-					if (typeof child.tag === 'string') return 'v'; //vNode
 					if (typeof ((child.parcel && child.parcel.view) || child.view) === 'function') return 'p'; //pNode
+					if (typeof child.tag === 'string') return 'v'; //vNode
 				}
 				return 's';  // Anything else is probably a value that can be turned into a string.
 

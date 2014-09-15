@@ -70,11 +70,11 @@ var expect = require('chai').expect;
 	describe('Simple Renderings:', function () {
 		var	renderView = function(vNode)  {
 			if (mock) resetWindow();
-			vdom.rootApp(new (Parcel.subClass({
+			vdom.rootApp(Parcel.subClass({
 				view: function () {
 					return vNode;
 				}
-			}))());
+			}));
 		};
 		it('a br', function () {
 			renderView(v('br'));
@@ -204,9 +204,8 @@ var expect = require('chai').expect;
 						return v(px);
 					}
 				}),
-				p = new P(),
 				n;
-			vdom.rootApp(p);
+			var p = vdom.rootApp(P);
 			if (mock) {
 				expect(mock.stats.get(), 1).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:2});
 				n = firstChild();
@@ -248,9 +247,8 @@ var expect = require('chai').expect;
 						return v(px, {data: 123});
 					},
 				}),
-				p = new P(),
 				n;
-			vdom.rootApp(p);
+			var p = vdom.rootApp(P);
 			if (mock) {
 				n = firstChild();
 				expect(n.getAttribute('data')).to.be.undefined;
@@ -273,7 +271,7 @@ var expect = require('chai').expect;
 					return v(px);
 				}
 			});
-			vdom.rootApp(new P(), anywhere);
+			vdom.rootApp(P, anywhere);
 			expect(anywhere.childNodes[0].nodeName).equal('SPAN');
 			expect(anywhere.childNodes[0].childNodes[0].id).equal(px.substr(1));
 			anywhere.parentNode.removeChild(anywhere);
@@ -283,9 +281,9 @@ var expect = require('chai').expect;
 	describe('Simple Rendering and refresh:', function () {
 		var	renderVFn = function(vFn)  {
 			if (mock) resetWindow();
-			vdom.rootApp(new (Parcel.subClass({
+			vdom.rootApp(Parcel.subClass({
 				view: vFn
-			}))());
+			}));
 		};
 		it('a div with mixed content', function () {
 			var p = prefix();
@@ -460,22 +458,28 @@ var expect = require('chai').expect;
 	describe('nested Views', function () {
 		var px1 = prefix(),
 			px2 = prefix(),
-			p1 = new (Parcel.subClass({
+			P1 = Parcel.subClass({
 				view: function () {
 					return v('p' + px1);
 				}
-			}))(),
-			p2 = new (Parcel.subClass({
+			}),
+			P2 = Parcel.subClass({
+				init: function () {
+					this.p1 = new P1();
+				},
 				view: function () {
-					return v(px2 ,[p1]);
+					return v(px2 ,[this.p1]);
+				},
+				destroy: function () {
+					this.p1.destroy();
 				}
-			}))(),
+			}),
 			n;
 
 
 		var	renderView = function(vFn)  {
 			if (mock) resetWindow();
-			vdom.rootApp(p2);
+			vdom.rootApp(P2);
 		};
 		it('should be nested one inside another', function () {
 			renderView();
@@ -530,13 +534,12 @@ var expect = require('chai').expect;
 				view: function () {
 					return v(px,{class:count++}, [in1, in2]);
 				}
-			}),
-			cont = new Cont();
+			});
 		it('first render', function () {
 			var n, vd, node, child;
 
 			if (mock) resetWindow();
-			vdom.rootApp(cont);
+			var cont = vdom.rootApp(Cont);
 	//		if (mock) {
 	//			n = firstChild();
 	//
@@ -685,11 +688,11 @@ var expect = require('chai').expect;
 					//if (px =="#a200_000") debugger;
 					if (mock) resetWindow();
 					var first = true;
-					vdom.rootApp(new (Parcel.subClass({
+					vdom.rootApp(Parcel.subClass({
 						view: function () {
 							return v(px ,(first?a:b));
 						}
-					}))());
+					}));
 
 					vd = getVDOM().children || [];
 					dd = (mock?firstChild().childNodes:q(px).childNodes);
@@ -746,12 +749,11 @@ var expect = require('chai').expect;
 						return v(px, (first?'abc':'def'));
 					}
 				}),
-				p = new P(),
 				n, vs;
 
 			if (mock) resetWindow();
 
-			vdom.rootApp(p);
+			vdom.rootApp(P);
 			if (mock) {
 				n = firstChild();
 
@@ -795,12 +797,11 @@ var expect = require('chai').expect;
 						return v(px, v(first?'p':'span'));
 					}
 				}),
-				p = new P(),
 				n, vs;
 
 			if (mock) resetWindow();
 
-			vdom.rootApp(p);
+			vdom.rootApp(P);
 			if (mock) {
 				n = firstChild();
 
@@ -854,12 +855,11 @@ var expect = require('chai').expect;
 						return v(px, first?new P1():new P2());
 					}
 				}),
-				p = new P(),
 				n, vs;
 
 			if (mock) resetWindow();
 
-			vdom.rootApp(p);
+			vdom.rootApp(P);
 			if (mock) {
 				n = firstChild();
 
