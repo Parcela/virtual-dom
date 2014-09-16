@@ -1,6 +1,6 @@
 {
     "name": "virtual-dom",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "Parcela's Virtual DOM",
     "license": "BSD 3-clause",
     "author": {
@@ -23,16 +23,16 @@
     ],
     "main": "virtual-dom.js",
     "dependencies": {
-        "utils": "Parcela/utils",
-        "lang-ext": "Parcela/lang-ext"
+        "utils": "git://github.com/Parcela/utils.git#v0.0.2",
+        "lang-ext": "git://github.com/Parcela/lang-ext.git#v0.0.2"
     },
     "devDependencies": {
         "chai": "^1.9.1",
         "istanbul": "^0.3.0",
         "jshint": "^2.5.5",
         "mocha": "^1.21.4",
-        "fake-dom": "Parcela/fake-dom",
-        "parcel": "Parcela/parcel"
+        "fake-dom": "git://github.com/Parcela/fake-dom.git#v0.0.2",
+        "parcel": "git://github.com/Parcela/parcel.git#v0.0.2"
     },
     "engines": {
         "node": "*"
