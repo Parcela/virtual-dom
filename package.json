@@ -23,16 +23,16 @@
     ],
     "main": "virtual-dom.js",
     "dependencies": {
-        "utils": "Parcela/utils.git#v0.0.2",
-        "lang-ext": "Parcela/lang-ext.git#v0.0.2"
+        "utils": "Parcela/utils",
+        "lang-ext": "Parcela/lang-ext"
     },
     "devDependencies": {
         "chai": "^1.9.1",
         "istanbul": "^0.3.0",
         "jshint": "^2.5.5",
         "mocha": "^1.21.4",
-        "fake-dom": "Parcela/fake-dom.git#v0.0.2",
-        "parcel": "Parcela/parcel.git#v0.0.2"
+        "fake-dom": "Parcela/fake-dom",
+        "parcel": "Parcela/parcel"
     },
     "engines": {
         "node": "*"
