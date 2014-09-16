@@ -898,4 +898,4 @@ var expect = require('chai').expect;
 			d(px);
 		});
 	});
-})(global.window || require('fake-dom')());
+})(global.window || require('fake-dom'));
