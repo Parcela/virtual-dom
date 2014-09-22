@@ -239,7 +239,10 @@ module.exports = function (window) {
 		@static
 		*/
 		rootApp: function (Parcel, rootNode, parcelConfig) {
-			if (rootParcel) rootParcel.destroy();
+			if (rootParcel) {
+				rootParcel._pNode.node.parentNode.removeChild(rootParcel._pNode.node);
+				rootParcel.destroy();
+			}
 			
 			if (arguments.length < 3 && rootNode && typeof rootNode.nodeName !== 'string') {
 				parcelConfig = rootNode;
