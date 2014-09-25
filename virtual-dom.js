@@ -1,27 +1,28 @@
 "use strict";
 
 /**
- * Provides virtual dom functionality for other modules.
- *
- * The module exports a single function which should be called to
- * fetch the [vDOM](../classes/vDOM.html) class.
- *
- * The function must be passed a reference to the DOM `window` object
- * or a reasonable substitute.
- * For modules to be loaded through Browserify,
- * this is usually `global.window`.  For modules loaded both through
- * Browserify or node, assuming a suitable emulator, it can be
- * done like this:
+Provides virtual dom functionality for other modules.
 
- * ```
- *    var vDOM = require('virtual-dom')(global.window || require('dom-window-emulator'));
- * ```
- *
- * @module virtual-dom
+The module exports a single function which should be called to
+fetch the [vDOM](../classes/vDOM.html) class.
+
+The function must be passed a reference to the DOM `window` object
+or a reasonable substitute.
+For modules to be loaded through Browserify,
+this is usually `global.window`.  For modules loaded both through
+Browserify or node, assuming a suitable emulator, it can be
+done like this:
+
+```js
+var vDOM = require('virtual-dom')(global.window || require('dom-window-emulator'));
+```
+
+@module virtual-dom
  */
+
 /**
- * Contains the virtual DOM handling methods and properties
- * @class vDOM
+Contains the virtual DOM handling methods and properties
+@class vDOM
 */
 var	_typeOf = require('utils').typeOf,
 	vNodesCache = {},
@@ -54,77 +55,77 @@ module.exports = function (window) {
 		*/
 		_vDOM: null,
 		/**
-		 * Helper function to build [vNodes](vNode.html).
-		 *
-		 * It takes the name of the `tag` to be created.
-		 * It supports the following four modifiers, following the rules of CSS selectors:
-		 *
-		 * * A `namespace` prefix followed by a colon:  `svg:line` (not needed, see note below)
-		 * * One or more CSS classes, each preceeded by a dot: `div.list`
-		 * * An `id` preceeded by a pound: `div#a1`
-		 * * One or more attribute assignments, each enclosed in square brackets: `input[type=checkbox]`
-		 *
-		 * Though the last three modifiers can be set via the `attrs` argument,
-		 * for performance reasons, if they won't change during the application
-		 * it is better to set them via the above modifiers and reserve
-		 * the attributes for variable parts.
-		 *
-		 * If modifiers are used, the tagName itself can be omitter and a `div` will be assumed.
-		 * Thus, `#a1` is the same as `div#al`.
-		 *
-		 * Attributes `class` and `style` have special treatment.
-		 *
-		 * The `class` attribute can be given as a string or as an array of values, the last being preferable.
-		 *
-		 * The `style` attribute should be set with an object containing a hash map of style names to values.
-		 * The style names should be in JavaScript format, not CSS format that is, `backgroundColor` not `background-color`.
-		 *
-		 * Neither the `svg:` or the `math:` namespaces are required.  The renderer will add the corresponding
-		 * `xmlns` attribute upon detecting the `<svg>` or `<math>` elements.  All elements contained within
-		 * any of those will be properly namespaced.
-		 *
-		 * @example
-		 *```
-		 *    var v = ITSA.Parcel.vNode;
-		 *
-		 *    v('br');
-		 *    // produces:
-		 *    {tag: 'br', attrs:{}, children:[]}
-		 *    // Which will result in: <br/>
-		 *
-		 *    v('ul.list', options.map(function (option) {
-		 *        return v('li', {'data-key': option.key}, option.text);
-		 *    }));
-		 *    // produces:
-		 *    {tag:'ul', attrs: {class:'list'}, children: [
-		 *        {tag:'li', attrs: {'data-key': 'k1'}, children: ['first value']},
-		 *        {tag:'li', attrs: {'data-key': 'k2'}, children: ['second value']}
-		 *    }
-		 *    // Which would result in:
-		 *    //<ul class="list">
-		 *    //    <li data-key="k1">first value</li>
-		 *    //    <li data-key="k2">second value</li>
-		 *    //</ul>
-		 *
-		 *    v('a#google.external[href="http://google.com"]", 'Google');
-		 *    //would eventually result in:
-		 *    <a id="google" class="external" href="http://google.com">Google</a>
-		 *```
-		 * It is recommended that unchanging classNames, IDs and attributes be encoded into the `tag` to improve
-		 * efficiency, as these can be cached.   Use the `attrs` object for variable attributes.
-		 *
-		 * @method vNode
-		 * @static
-		 * @param tag {String} Name of the tag to be created.
-		 *  Much like with a CSS selector,
-		 *  it can be followed by a `#` and an ID,
-		 *  any number of CSS classNames each preceded by a `.`
-		 *  and attribute assignments enclosed in square brackets (see example above).
-		 * @param [attrs] {Object} Collection of attributes to be set on the node.
-		 *  Any value assigned to the `class` attribute will be appended to those provided along the tag.
-		 * @param [children] {any}  It can be a further virtual DOM node, a parcel,
-		 * a simple value which will result in a text string or an array of either.
-		 * @return {Object} virtual DOM node.
+		Helper function to build [vNodes](vNode.html).
+		
+		It takes the name of the `tag` to be created.
+		It supports the following four modifiers, following the rules of CSS selectors:
+		
+		* A `namespace` prefix followed by a colon:  `svg:line` (not needed, see note below)
+		* One or more CSS classes, each preceeded by a dot: `div.list`
+		* An `id` preceeded by a pound: `div#a1`
+		* One or more attribute assignments, each enclosed in square brackets: `input[type=checkbox]`
+		
+		Though the last three modifiers can be set via the `attrs` argument,
+		for performance reasons, if they won't change during the application
+		it is better to set them via the above modifiers and reserve
+		the attributes for variable parts.
+		
+		If modifiers are used, the tagName itself can be omitter and a `div` will be assumed.
+		Thus, `#a1` is the same as `div#al`.
+		
+		Attributes `class` and `style` have special treatment.
+		
+		The `class` attribute can be given as a string or as an array of values, the last being preferable.
+		
+		The `style` attribute should be set with an object containing a hash map of style names to values.
+		The style names should be in JavaScript format, not CSS format that is, `backgroundColor` not `background-color`.
+		
+		Neither the `svg:` or the `math:` namespaces are required.  The renderer will add the corresponding
+		`xmlns` attribute upon detecting the `<svg>` or `<math>` elements.  All elements contained within
+		any of those will be properly namespaced.
+		
+		@example
+		```
+		var v = ITSA.Parcel.vNode;
+		
+		v('br');
+		// produces:
+		{tag: 'br', attrs:{}, children:[]}
+		// Which will result in: <br/>
+		
+		v('ul.list', options.map(function (option) {
+		    return v('li', {'data-key': option.key}, option.text);
+		}));
+		// produces:
+		{tag:'ul', attrs: {class:'list'}, children: [
+		    {tag:'li', attrs: {'data-key': 'k1'}, children: ['first value']},
+		    {tag:'li', attrs: {'data-key': 'k2'}, children: ['second value']}
+		}
+		// Which would result in:
+		//<ul class="list">
+		//    <li data-key="k1">first value</li>
+		//    <li data-key="k2">second value</li>
+		//</ul>
+		
+		v('a#google.external[href="http://google.com"]", 'Google');
+		// would eventually result in:
+		// <a id="google" class="external" href="http://google.com">Google</a>
+		```
+		It is recommended that unchanging classNames, IDs and attributes be encoded into the `tag` to improve
+		efficiency, as these can be cached.   Use the `attrs` object for variable attributes.
+		
+		@method vNode
+		@static
+		@param tag {String} Name of the tag to be created.
+		 Much like with a CSS selector,
+		 it can be followed by a `#` and an ID,
+		 any number of CSS classNames each preceded by a `.`
+		 and attribute assignments enclosed in square brackets (see example above).
+		@param [attrs] {Object} Collection of attributes to be set on the node.
+		 Any value assigned to the `class` attribute will be appended to those provided along the tag.
+		@param [children] {any}  It can be a further virtual DOM node, a parcel,
+		a simple value which will result in a text string or an array of either.
+		@return {Object} virtual DOM node.
 		*/
 		vNode: function (tag, attrs, children) {
 			var classes = [], vAttrs = {};
@@ -203,20 +204,20 @@ module.exports = function (window) {
 		},
 
 		/**
-		 * Triggers the rendering process for the page or parcel.
-		 *
-		 * The rendering process starts with the production of a new virtual DOM for the page or component
-		 * and a comparisson of the newly created *expected* DOM against the *existing* DOM.
-		 * The render process will only change those nodes in the actual DOM that differ in between the two.
-		 *
-		 * Called without any arguments, it will start the process at the root of the virtual DOM.
-		 * If provided with an argument it will start the process at the branch of the virtual DOM
-		 * controlled by the given Parcel instance.
-		 *
-		 * @method render
-		 * @static
-		 * @param [parcel] {Parcel} Instance of Parcel in control of a section of a page.
-		 *
+		Triggers the rendering process for the page or parcel.
+		
+		The rendering process starts with the production of a new virtual DOM for the page or component
+		and a comparisson of the newly created *expected* DOM against the *existing* DOM.
+		The render process will only change those nodes in the actual DOM that differ in between the two.
+		
+		Called without any arguments, it will start the process at the root of the virtual DOM.
+		If provided with an argument it will start the process at the branch of the virtual DOM
+		controlled by the given Parcel instance.
+		
+		@method render
+		@param [parcel] {Parcel} Instance of Parcel in control of a section of a page.
+		@static
+		
 		*/
 		render: function (parcel) {
 			parcel = parcel || rootParcel;
@@ -240,8 +241,9 @@ module.exports = function (window) {
 		*/
 		rootApp: function (Parcel, rootNode, parcelConfig) {
 			if (rootParcel) {
-				rootParcel._pNode.node.parentNode.removeChild(rootParcel._pNode.node);
+				v._postViews(rootParcel);
 				rootParcel.destroy();
+				rootParcel._pNode.node.parentNode.removeChild(rootParcel._pNode.node);
 			}
 			
 			if (arguments.length < 3 && rootNode && typeof rootNode.nodeName !== 'string') {
@@ -265,22 +267,54 @@ module.exports = function (window) {
 			return rootParcel;
 		},
 		/**
+		Executes the given function `fn` on all parcels in the vDOM
+		starting from the given `parcel`.
+		
+		@method _forAllPNodes
+		@param parcel {Parcel} parcel to start executing from
+		@param fn {Function} function to execute on each parcel
+		@private
+		*/
+		_forAllPNodes: function (parcel, fn) {
+			var _forEach= function (pNode) {
+				pNode.childPNodes.forEach(_forEach);
+				fn(pNode.parcel);
+			};
+			_forEach(parcel._pNode);
+			fn(parcel);
+		},
+		/**
+		Calls `postView` on all the parcels in the branch starting
+		at the given `parcel`
+		
+		@method _postViews
+		@param parcel {Parcel} parcel to start calling `postView` on.
+		@private
+		*/
+		_postViews: function (parcel) {
+			v._forAllPNodes(parcel, function (parcel) {
+				parcel.postView();
+			});
+		},
+		/**
 		Returns a new `pNode` based on the given parcel and namspace.
 
 		@method _buildPNode
 		@param parcel {Parcel} Parcel instance that serves as the basis for this parcel
 		@param [namespace] {String} current XML namespace URL
+		@param [parentPNode] {pNode} The pNode that is the ancestor of this one.
 		@return {pNode} a new `pNode` based on the given parcel
 		@private
 		*/
 
-		_buildPNode: function (parcel, namespace) {
+		_buildPNode: function (parcel, namespace, parentPNode) {
 			var pNode = v._buildVNode(parcel.containerType, namespace)
-				.merge( {parcel:parcel, stamp:NaN, attrs: {}, children:[]});
+				.merge( {parcel:parcel, stamp:NaN, attrs: {}, children:[], childPNodes:[]});
 
+			if (parentPNode) parentPNode.childPNodes.push(pNode);
 			parcel._pNode = pNode;
 			parcel.preView();
-			v._diffPNode(pNode, parcel);
+			v._diffPNode(pNode, parcel, pNode);
 			return pNode;
 		},
 		/**
@@ -327,17 +361,13 @@ module.exports = function (window) {
 		@param children {[vNode | pNode]} Array of children to lookk into
 		@private
 		*/
-		_skipPNode: function (children) {
+		_skipPNode: function (childPNodes) {
 			var child, l;
-			if (children) {
-				l = children.length || 0;
+			if (childPNodes) {
+				l = childPNodes.length || 0;
 				for (var i = 0; i < l; i++) {
-					child = children[i];
-					if (child.parcel) {
-						v._diffPNode(child.parcel._pNode, child.parcel);
-					} else {
-						v._skipPNode(child.children);
-					}
+					child = childPNodes[i];
+					v._diffPNode(child.parcel._pNode, child.parcel);
 				}
 			}
 		},
@@ -348,22 +378,23 @@ module.exports = function (window) {
 		@method _diffPNode
 		@param existing {pNode} The existing `pNode`
 		@param parcel {Parcel} parcel that will supply the new pNode to compare against
+		@param [parentPNode] {pNode} The pNode that is the ancestor of this one.
 		@protected
 		@static
 		*/
-		_diffPNode: function (existing, parcel) {
+		_diffPNode: function (existing, parcel, parentPNode) {
 			var stamp = parcel.stamp();
 			if (existing.stamp === stamp) {
-				v._skipPNode(existing.children);
+				v._skipPNode(existing.childPNodes);
 			} else {
 				existing.stamp = stamp;
 				var children = parcel.view();
 				if (!Array.isArray(children)) children = [children];
 
-				var expected =  {parcel:parcel, stamp:NaN, children: children, attrs: {}};
+				var expected =  {parcel:parcel, stamp:NaN, children: children, attrs: {}, childPNodes:[]};
 				expected.attrs.merge(parcel.attributes);
 				expected.attrs.class = ['parcel',  parcel.className];
-				v._diffVNodes(existing, expected);
+				v._diffVNodes(existing, expected, null, parentPNode);
 			}
 		},
 
@@ -376,13 +407,14 @@ module.exports = function (window) {
 		@param existing {vNode} Branch of the virtual DOM that represents the actual, current DOM
 		@param expected {vNode} The same branch as it should become
 		@param [namespace] {String} current XML namespace URL
+		@param [parentPNode] {pNode} The pNode that is the ancestor of this one.
 		@protected
 		@static
 		*/
-		_diffVNodes: function ( existing, expected, namespace) {
+		_diffVNodes: function ( existing, expected, namespace, parentPNode) {
 			namespace = (existing.attrs && existing.attrs.xmlns) || namespace;
 			v._diffAttrs(existing, expected, namespace);
-			v._diffChildren(existing.node, existing, expected, namespace);
+			v._diffChildren(existing.node, existing, expected, namespace, parentPNode);
 		},
 
 		/**
@@ -394,16 +426,17 @@ module.exports = function (window) {
 		@param existing {vNode} virtual representation of the actual DOM
 		@param expected {vNode} virtual representation of how it should be
 		@param [namespace] {String} current XML namespace URL
+		@param [parentPNode] {pNode} The pNode that is the ancestor of this one.
 		@protected
 		@static
 		*/
-		_diffChildren: function (parentEl, existing, expected, namespace) {
+		_diffChildren: function (parentEl, existing, expected, namespace, parentPNode) {
 
 			// need to take care of keyed elements
 			var children = existing.children || [],
 				newChildren = expected.children || [],
 				l = Math.max(children.length, newChildren.length),
-				childPos, node,
+				childPos, node, oldNode,
 				child, newChild,
 				operations = [];
 
@@ -428,7 +461,20 @@ module.exports = function (window) {
 				}
 			};
 
+			var whatIsIt = function (child) {
+				if (child === undefined) return 'u';
+				if (typeof child === 'object') {
+					if (typeof ((child.parcel && child.parcel.view) || child.view) === 'function') return 'p'; //pNode
+					if (typeof child.tag === 'string') return 'v'; //vNode
+				}
+				return 's';  // Anything else is probably a value that can be turned into a string.
 
+			};
+
+			for (childPos = 0; childPos < l; childPos++) {
+				child = children[childPos];
+				newChild = newChildren[childPos];
+				switch (whatIsIt(child) + whatIsIt(newChild)) {
 			/*
 			Replacers are functions to replace one kind of node for another.
 			They are keyed with two letters corresponding to the current type of node
@@ -443,132 +489,122 @@ module.exports = function (window) {
 			Currently it has all the ones where the origin and destination are the same first,
 			then the rest grouped by destination.
 			*/
-			var replacers = {
 				// All the ones that have the same type of destination as source
-				uu: function () {
-				},
-				vv: function () {
+				case 'uu':
+				    break;
+				case 'vv':
 					if (child.tag != newChild.tag) {
-						var oldNode = child.node;
+						oldNode = child.node;
 						child = v._buildVNode(newChild.tag, namespace);
 
-						v._diffVNodes( child, newChild, namespace);
+						v._diffVNodes( child, newChild, namespace, parentPNode);
 
 						insertNode(oldNode);
 					} else {
-						v._diffVNodes(child, newChild, namespace);
+						v._diffVNodes(child, newChild, namespace, parentPNode);
 					}
-				},
-				pp: function () {
+				    break;
+				case 'pp':
 					if (child.parcel === newChild) {
-						v._diffPNode(child, newChild);
+						v._diffPNode(child, newChild, parentPNode);
 					} else {
-						var oldNode = child.node;
-						child.parcel.postView();
-						child = v._buildPNode(newChild, namespace);
+						oldNode = child.node;
+						v._postViews(child.parcel);
+						child = v._buildPNode(newChild, namespace, parentPNode);
 
 						insertNode(oldNode);
 					}
-				},
-				ss: function () {
+				    break;
+				case 'ss':
 					if (child != newChild) {
 						child.node.nodeValue = newChild;
 						children[childPos] = new String(newChild);
 						children[childPos].node = child.node;
 					}
-				},
+				    break;
 
 				// These end up with nothing so whatever was there has to be removed:
-				vu: removeNode,
-				pu: function () {
-					child.parcel.postView();
+				case 'vu': 
+						removeNode();
+						break;
+				case 'pu':
+					v._postViews(child.parcel);
 					removeNode();
-				},
-				su: removeNode,
+				    break;
+				case 'su': 
+						removeNode();
+						break;
 
 				// The following are ordered by destination
 
-				uv: function () {
+				case 'uv':
 					child = v._buildVNode(newChild.tag, namespace);
 
-					v._diffVNodes(child, newChild, namespace);
+					v._diffVNodes(child, newChild, namespace, parentPNode);
 
 					insertNode();
-				},
-				pv: function () {
-					var oldNode = child.node;
-					child.parcel.postView();
-
-					child = v._buildVNode(newChild.tag, namespace);
-
-					v._diffVNodes(child, newChild, namespace);
-
-					insertNode(oldNode);
-				},
-				sv: function () {
-					var oldNode = child.node;
+				    break;
+				case 'pv':
+					oldNode = child.node;
+					
+					v._postViews(child.parcel);
 
 					child = v._buildVNode(newChild.tag, namespace);
 
-					v._diffVNodes(child, newChild, namespace);
+					v._diffVNodes(child, newChild, namespace, parentPNode);
 
 					insertNode(oldNode);
-				},
-				up: function ()	{
-					child = v._buildPNode(newChild, namespace);
+				    break;
+				case 'sv':
+					oldNode = child.node;
+
+					child = v._buildVNode(newChild.tag, namespace);
+
+					v._diffVNodes(child, newChild, namespace, parentPNode);
+
+					insertNode(oldNode);
+				    break;
+				case 'up':
+					child = v._buildPNode(newChild, namespace, parentPNode);
 
 					insertNode();
-				},
-				vp: function () {
-					var oldNode = child.node;
-					child = v._buildPNode(newChild, namespace);
+				    break;
+				case 'vp':
+					oldNode = child.node;
+					child = v._buildPNode(newChild, namespace, parentPNode);
 
 					insertNode(oldNode);
-				},
-				sp: function () {
-					var oldNode = child.node;
-					child = v._buildPNode(newChild, namespace);
+				    break;
+				case 'sp':
+					oldNode = child.node;
+					child = v._buildPNode(newChild, namespace, parentPNode);
 
 					insertNode(oldNode);
-				},
-				us: function () {
+				    break;
+				case 'us':
 					child = v._buildStringNode(newChild);
 
 					insertNode();
-				},
-				vs: function () {
-					var oldNode = child.node;
+				    break;
+				case 'vs':
+					oldNode = child.node;
 					child = v._buildStringNode(newChild);
 
 					insertNode(oldNode);
-				},
-				ps: function () {
-					var oldNode = child.node;
-					child.parcel.postView();
+				    break;
+				case 'ps':
+					oldNode = child.node;
+					v._postViews(child.parcel);
 
 					child = v._buildStringNode(newChild);
 
 					insertNode(oldNode);
+					break;
 				}
-			};
-
-			var whatIsIt = function (child) {
-				if (child === undefined) return 'u';
-				if (typeof child === 'object') {
-					if (typeof ((child.parcel && child.parcel.view) || child.view) === 'function') return 'p'; //pNode
-					if (typeof child.tag === 'string') return 'v'; //vNode
-				}
-				return 's';  // Anything else is probably a value that can be turned into a string.
-
-			};
-
-			for (childPos = 0; childPos < l; childPos++) {
-				child = children[childPos];
-				newChild = newChildren[childPos];
-
-				replacers[whatIsIt(child) + whatIsIt(newChild)]();
-
 			}
+
+
+
 
 			if (!existing.children && children.length) existing.children = children;
 		},
