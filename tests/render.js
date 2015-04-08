@@ -13,7 +13,16 @@ var expect = require('chai').expect;
 
 	describe('testing portions of vDOM', function () {
 		it ('_diffClassNames' , function () {
-			var e = { node: {className:'-'}};
+			var e = { 
+				node: {
+					className:'-',
+					setAttribute: function (name, value) {
+						if (name === 'class') {
+							this.className = value;
+						}
+					}
+				}
+			};
 
 			vdom._diffClassNames(e, ['a','c'],['c','a']);
 			expect(e.node.className).to.be.equal('-');
@@ -74,7 +83,7 @@ var expect = require('chai').expect;
 			renderView(v('br'));
 			if (mock) {
 				expect(firstChild().nodeName).equal('BR');
-				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1});
+				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:1});
 			} else {
 				hasOne('body > div > br');
 				expect(getVDOM()).to.be.eql({tag:'br',node: q('body > div > br')});
@@ -85,7 +94,7 @@ var expect = require('chai').expect;
 			var p = prefix();
 			renderView(v(p));
 			if (mock) {
-				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:1, removeChild:1});
+				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:2, removeChild:1});
 			} else {
 				hasOne(p);
 				expect(getVDOM()).to.be.eql({tag:'div',node: q(p), attrs:{id:p.substr(1)}});
@@ -102,7 +111,7 @@ var expect = require('chai').expect;
 			]));
 			if (mock) {
 				var n = firstChild();
-				expect(mock.stats.get()).eql({ createElement: 3, insertBefore: 4, createTextNode: 2, appendChild:1 , setAttribute:1, removeChild:1});
+				expect(mock.stats.get()).eql({ createElement: 3, insertBefore: 4, createTextNode: 2, appendChild:1 , setAttribute:2, removeChild:1});
 				expect(n.nodeName).equal('DIV');
 				expect(n.id).equal(p.substr(1));
 				expect(n.childNodes[0].nodeValue).equal('before');
@@ -124,7 +133,7 @@ var expect = require('chai').expect;
 			renderView(v(p + '.z', {class:'a'}));
 			if (mock) {
 				var n = firstChild();
-				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:1, removeChild:1});
+				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:3, removeChild:1});
 				expect(n.nodeName).equal('DIV');
 				expect(n.className.split(' ').sort().join(' ')).equal('a z');
 			} else {
@@ -139,7 +148,7 @@ var expect = require('chai').expect;
 			renderView(v(p + '.z',{class:'a b'}));
 			if (mock) {
 				var n = firstChild();
-				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:1, removeChild:1});
+				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:3, removeChild:1});
 				expect(n.nodeName).equal('DIV');
 				expect(n.className.split(' ').sort().join(' ')).equal('a b z');
 			} else {
@@ -154,7 +163,7 @@ var expect = require('chai').expect;
 			renderView(v(p + '.z',{class:['a', 'b']}));
 			if (mock) {
 				var n = firstChild();
-				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:1, removeChild:1});
+				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:3, removeChild:1});
 				expect(n.nodeName).equal('DIV');
 				expect(n.className.split(' ').sort().join(' ')).equal('a b z');
 			} else {
@@ -167,7 +176,7 @@ var expect = require('chai').expect;
 			renderView(v(p,{style:{color:'red', margin:'1em'}}));
 			if (mock) {
 				var n = firstChild();
-				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:1, removeChild:1});
+				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:2, removeChild:1});
 				expect(n.nodeName).equal('DIV');
 				expect(n.style.color).equal('red');
 				expect(n.style.margin).equal('1em');
@@ -194,7 +203,7 @@ var expect = require('chai').expect;
 				n;
 			var p = vdom.rootApp(P);
 			if (mock) {
-				expect(mock.stats.get(), 1).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:2, removeChild:1});
+				expect(mock.stats.get(), 1).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:3, removeChild:1});
 				n = firstChild();
 				expect(n.nodeName, 1).equal('DIV');
 				expect(n.parentNode.nodeName, 1).eql('SPAN');
@@ -209,7 +218,7 @@ var expect = require('chai').expect;
 			vdom.render();
 
 			if (mock) {
-				expect(mock.stats.get(), 2).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:3, getAttribute: 1, removeChild:1});
+				expect(mock.stats.get(), 2).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:4, getAttribute: 1, removeChild:1});
 				n = firstChild();
 				expect(n.nodeName, 1).equal('DIV');
 				expect(n.parentNode.nodeName, 1).eql('SPAN');
@@ -283,7 +292,7 @@ var expect = require('chai').expect;
 			});
 			if (mock) {
 				n = firstChild();
-				expect(mock.stats.get(), 1).eql({ createElement: 3, insertBefore: 4, createTextNode: 2, appendChild:1, setAttribute:1,removeChild:1});
+				expect(mock.stats.get(), 1).eql({ createElement: 3, insertBefore: 4, createTextNode: 2, appendChild:1, setAttribute:2,removeChild:1});
 				expect(n.nodeName, 1).equal('DIV');
 				expect(n.id, 1).equal(p.substr(1));
 				expect(n.childNodes[0].nodeValue, 1).equal('before0');
@@ -298,7 +307,7 @@ var expect = require('chai').expect;
 			vdom.render();
 			if (mock) {
 				n = firstChild();
-				expect(mock.stats.get(), 2).eql({ createElement: 3, insertBefore: 4, createTextNode: 2 , appendChild:1, setAttribute:1,removeChild:1 });
+				expect(mock.stats.get(), 2).eql({ createElement: 3, insertBefore: 4, createTextNode: 2 , appendChild:1, setAttribute:3,removeChild:1 });
 				expect(n.nodeName, 2).equal('DIV');
 				expect(n.id, 2).equal(p.substr(1));
 				expect(n.childNodes[0].nodeValue, 2).equal('before1');
@@ -317,7 +326,7 @@ var expect = require('chai').expect;
 			});
 			if (mock) {
 				n = firstChild();
-				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:1,removeChild:1});
+				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:3,removeChild:1});
 				expect(n.nodeName).equal('DIV');
 				expect(n.className.split(' ').sort().join(' ')).equal('a z');
 			} else {
@@ -328,7 +337,7 @@ var expect = require('chai').expect;
 			vdom.render();
 			if (mock) {
 				n = firstChild();
-				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:1,removeChild:1});
+				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:5,removeChild:1});
 				expect(n.nodeName).equal('DIV');
 				expect(n.className.split(' ').sort().join(' ')).equal('b z');
 			} else {
@@ -343,7 +352,7 @@ var expect = require('chai').expect;
 			});
 			if (mock) {
 				n = firstChild();
-				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:1,removeChild:1});
+				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:3,removeChild:1});
 				expect(n.nodeName).equal('DIV');
 				expect(n.className.split(' ').sort().join(' ')).equal('a b z');
 			} else {
@@ -354,7 +363,7 @@ var expect = require('chai').expect;
 			vdom.render();
 			if (mock) {
 				n = firstChild();
-				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:1,removeChild:1});
+				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:5,removeChild:1});
 				expect(n.nodeName).equal('DIV');
 				expect(n.className.split(' ').sort().join(' ')).equal('a d z');
 			} else {
@@ -369,7 +378,7 @@ var expect = require('chai').expect;
 			});
 			if (mock) {
 				n = firstChild();
-				expect(mock.stats.get()).eql({ createElement:2 , insertBefore: 1, appendChild:1, setAttribute:1,removeChild:1});
+				expect(mock.stats.get()).eql({ createElement:2 , insertBefore: 1, appendChild:1, setAttribute:3,removeChild:1});
 				expect(n.nodeName).equal('DIV');
 				expect(n.className.split(' ').sort().join(' ')).equal('a b z');
 			} else {
@@ -380,7 +389,7 @@ var expect = require('chai').expect;
 			vdom.render();
 			if (mock) {
 				n = firstChild();
-				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:1,removeChild:1});
+				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:5,removeChild:1});
 				expect(n.nodeName).equal('DIV');
 				expect(n.className.split(' ').sort().join(' ')).equal('a b g z');
 			} else {
@@ -395,7 +404,7 @@ var expect = require('chai').expect;
 			});
 			if (mock) {
 				n = firstChild();
-				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:1,removeChild:1});
+				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:2,removeChild:1});
 				expect(n.nodeName).equal('DIV');
 				expect(n.style.color).equal('red');
 				expect(n.style.margin).equal('1em');
@@ -408,7 +417,7 @@ var expect = require('chai').expect;
 			vdom.render();
 			if (mock) {
 				n = firstChild();
-				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:1,removeChild:1});
+				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:3,removeChild:1});
 				expect(n.nodeName).equal('DIV');
 				expect(n.style.color).equal('blue');
 				expect(n.style.margin).equal('1em');
@@ -422,7 +431,7 @@ var expect = require('chai').expect;
 			vdom.render();
 			if (mock) {
 				n = firstChild();
-				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:1,removeChild:1});
+				expect(mock.stats.get()).eql({ createElement: 2, insertBefore: 1, appendChild:1, setAttribute:3,removeChild:1});
 				expect(n.nodeName).equal('DIV');
 				expect(n.style.color).equal('blue');
 				expect(n.style.margin).to.be.undefined;
@@ -466,7 +475,7 @@ var expect = require('chai').expect;
 			renderView();
 			if (mock) {
 				n = firstChild();
-				expect(mock.stats.get()).eql({ createElement: 4, insertBefore: 3, appendChild:1, setAttribute:2,removeChild:1});
+				expect(mock.stats.get()).eql({ createElement: 4, insertBefore: 3, appendChild:1, setAttribute:4,removeChild:1});
 				expect(n.nodeName).eql('DIV');
 				expect(n.id).eql(px2.substr(1));
 				n = n.childNodes[0];
@@ -736,7 +745,7 @@ var expect = require('chai').expect;
 			if (mock) {
 				n = firstChild();
 
-				expect(mock.stats.get(), 'before').eql({ createElement: 2, insertBefore: 2, createTextNode: 1, appendChild:1 , setAttribute:1, removeChild:1});
+				expect(mock.stats.get(), 'before').eql({ createElement: 2, insertBefore: 2, createTextNode: 1, appendChild:1 , setAttribute:2, removeChild:1});
 				expect(n.nodeName, 'before').equal('DIV');
 				expect(n.id, 'before').equal(px.substr(1));
 				expect(n.childNodes[0].nodeValue, 'before').equal('abc');
@@ -754,7 +763,7 @@ var expect = require('chai').expect;
 			if (mock) {
 				n = firstChild();
 
-				expect(mock.stats.get(), 'after').eql({ createElement: 2, insertBefore: 2, createTextNode: 1, appendChild:1 , setAttribute:1, removeChild:1});
+				expect(mock.stats.get(), 'after').eql({ createElement: 2, insertBefore: 2, createTextNode: 1, appendChild:1 , setAttribute:3, removeChild:1});
 				expect(n.nodeName, 'after').equal('DIV');
 				expect(n.id, 'after').equal(px.substr(1));
 				expect(n.childNodes[0].nodeValue, 'after').equal('def');
@@ -783,7 +792,7 @@ var expect = require('chai').expect;
 			if (mock) {
 				n = firstChild();
 
-				expect(mock.stats.get(), 'before').eql({ createElement: 3, insertBefore: 2,  appendChild:1 , setAttribute:1, removeChild:1});
+				expect(mock.stats.get(), 'before').eql({ createElement: 3, insertBefore: 2,  appendChild:1 , setAttribute:2, removeChild:1});
 				expect(n.nodeName, 'before').equal('DIV');
 				expect(n.id, 'before').equal(px.substr(1));
 				expect(n.childNodes[0].nodeName, 'before').equal('P');
@@ -802,7 +811,7 @@ var expect = require('chai').expect;
 			if (mock) {
 				n = firstChild();
 
-				expect(mock.stats.get(), 'after').eql({ createElement: 4, insertBefore: 2,  appendChild:1 , setAttribute:1, replaceChild:1, removeChild:1});
+				expect(mock.stats.get(), 'after').eql({ createElement: 4, insertBefore: 2,  appendChild:1 , setAttribute:3, replaceChild:1, removeChild:1});
 				expect(n.nodeName, 'after').equal('DIV');
 				expect(n.id, 'after').equal(px.substr(1));
 				expect(n.childNodes[0].nodeName, 'after').equal('SPAN');
@@ -840,7 +849,7 @@ var expect = require('chai').expect;
 			if (mock) {
 				n = firstChild();
 
-				expect(mock.stats.get(), 'before').eql({ createElement: 3, insertBefore: 2,  appendChild:1 , setAttribute:1, removeChild:1});
+				expect(mock.stats.get(), 'before').eql({ createElement: 3, insertBefore: 2,  appendChild:1 , setAttribute:3, removeChild:1});
 				expect(n.nodeName, 'before').equal('DIV');
 				expect(n.id, 'before').equal(px.substr(1));
 				expect(n.childNodes[0].nodeName, 'before').equal('P');
@@ -860,7 +869,7 @@ var expect = require('chai').expect;
 			if (mock) {
 				n = firstChild();
 
-				expect(mock.stats.get(), 'after').eql({ createElement: 4, insertBefore: 2,  appendChild:1 , setAttribute:1, replaceChild:1, removeChild:1});
+				expect(mock.stats.get(), 'after').eql({ createElement: 4, insertBefore: 2,  appendChild:1 , setAttribute:5, replaceChild:1, removeChild:1});
 				expect(n.nodeName, 'after').equal('DIV');
 				expect(n.id, 'after').equal(px.substr(1));
 				expect(n.childNodes[0].nodeName, 'after').equal('SPAN');
