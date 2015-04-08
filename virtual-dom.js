@@ -637,6 +637,13 @@ module.exports = function (window) {
 				}
 				var newValue = newAttrs[name];
 				switch (name) {
+					case 'checked':
+						if (newValue) {
+							node.setAttribute(name, name);
+						} else {
+							node.removeAttribute(name);
+						}
+						break;
 					case 'style':
 						v._diffStyles(existing, value, newValue);
 						break;
@@ -668,13 +675,16 @@ module.exports = function (window) {
 				if(!(name in attrs)) {
 					attrs[name] = value;
 					switch (name) {
+						case 'checked':
+							if (value) node.setAttribute(name, name);
+							break;
 						case 'style':
 							value.each(function (style, key) {
 								node.style[key] = style;
 							});
 							return;
 						case 'class':
-							node.className = value.join(' ').trim();
+							node.setAttribute('class', value.join(' ').trim());
 							return;
 						case 'data':
 						if (!namespace) break;
@@ -715,7 +725,7 @@ module.exports = function (window) {
 				while (i < l && value[i] == newValue[i]) i++;
 			}
 			if (i < l) {
-				existing.node.className = newValue.join(' ').trim();
+				existing.node.setAttribute('class', newValue.join(' ').trim());
 			}
 		},
 		/**
